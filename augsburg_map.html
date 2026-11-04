@@ -21,7 +21,10 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height: 1.8;
       font-size: 0.8rem; max-width: 240px;
     }
-    .legend h4 { font-size: 0.85rem; margin-bottom: 6px; color: #333; }
+    .legend h4 { font-size: 0.85rem; margin-bottom: 6px; color: #333; cursor: pointer; user-select: none; }
+    .legend h4::after { content: ' ▲'; font-size: 0.65rem; color: #aaa; }
+    .legend.collapsed h4::after { content: ' ▼'; }
+    .legend.collapsed .legend-body { display: none; }
     .legend-item {
       display: flex; align-items: center; gap: 8px; cursor: pointer;
       padding: 2px 4px; border-radius: 4px; transition: background 0.15s;
@@ -319,6 +322,11 @@ const legendCtrl = L.control({ position: 'bottomleft' });
 legendCtrl.onAdd = function () {
   const div = L.DomUtil.create('div', 'legend');
   div.innerHTML = '<h4>Quellen <small style="color:#aaa;font-weight:normal">(klicken zum Ein-/Ausblenden)</small></h4>';
+  const body = document.createElement('div');
+  body.className = 'legend-body';
+  div.appendChild(body);
+
+  div.querySelector('h4').addEventListener('click', () => div.classList.toggle('collapsed'));
 
   SOURCES.forEach(s => {
     const count = STATIONS.filter(st => st.src === s.id).length;
@@ -334,7 +342,7 @@ legendCtrl.onAdd = function () {
       if (visible) { map.removeLayer(layers[s.id]); item.classList.add('hidden'); }
       else          { map.addLayer(layers[s.id]);    item.classList.remove('hidden'); }
     });
-    div.appendChild(item);
+    body.appendChild(item);
     if (s.urls && s.urls.length) {
       const links = document.createElement('div');
       links.style.cssText = 'padding-left:22px; margin-bottom:2px;';
@@ -342,14 +350,19 @@ legendCtrl.onAdd = function () {
         `<a href="${u.href}" target="_blank" style="font-size:0.65rem;color:#2b7de9;margin-right:8px;text-decoration:none;">↗ ${u.label}</a>`
       ).join('');
       L.DomEvent.disableClickPropagation(links);
-      div.appendChild(links);
-    }
-  });
+      body.appendChild(links);
+    }  });
 
   const note = document.createElement('p');
   note.style.cssText = 'font-size:0.68rem;color:#aaa;margin-top:8px;line-height:1.4;border-top:1px solid #eee;padding-top:6px';
   note.innerHTML = '⚠ Koordinaten sind Näherungswerte.<br>★ = Unterkunft · <b>P</b> = Parkplatz<br>Augustusbrunnen erscheint in 2 Layern.';
-  div.appendChild(note);
+  body.appendChild(note);
+
+  const guide = document.createElement('div');
+  guide.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid #eee;';
+  guide.innerHTML = '<a href="https://www.augsburg-tourismus.de/files/augsburgtourismus/media/infomaterial/pdf/2023/regio_stadtspaziergaenge_augsburg_2023_web.pdf" target="_blank" style="font-size:0.7rem;color:#2b7de9;text-decoration:none;">↗ Stadtspaziergänge Augsburg (PDF)</a>';
+  L.DomEvent.disableClickPropagation(guide);
+  body.appendChild(guide);
 
   L.DomEvent.disableClickPropagation(div);
   return div;
