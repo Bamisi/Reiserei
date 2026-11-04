@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Augsburg – Alle Stationen</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; height: 100vh; }
+    #header {
+      background: #1a1a2e; color: #eee; padding: 10px 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    #header h1 { font-size: 1.1rem; font-weight: 600; }
+    #header small { color: #aaa; font-size: 0.75rem; }
+    #map { flex: 1; }
+
+    .legend {
+      background: white; border-radius: 8px; padding: 10px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2); line-height: 1.8;
+      font-size: 0.8rem; max-width: 240px;
+    }
+    .legend h4 { font-size: 0.85rem; margin-bottom: 6px; color: #333; }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+      padding: 2px 4px; border-radius: 4px; transition: background 0.15s;
+    }
+    .legend-item:hover { background: #f0f0f0; }
+    .legend-item.hidden { opacity: 0.35; text-decoration: line-through; }
+    .legend-dot {
+      width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0;
+      border: 2px solid rgba(0,0,0,0.3);
+    }
+    .leaflet-popup-content { font-size: 0.85rem; line-height: 1.5; min-width: 180px; }
+    .popup-source { font-size: 0.72rem; color: #777; margin-top: 4px; }
+    .popup-badge {
+      display: inline-block; padding: 1px 7px; border-radius: 10px;
+      color: white; font-size: 0.7rem; font-weight: 600; margin-top: 4px; margin-right: 3px;
+    }
+    .popup-note { font-size: 0.68rem; color: #e07b00; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <h1>🗺 Augsburg – Alle Stationen</h1>
+  <small id="count-badge">6 Quellen · wird geladen…</small>
+</div>
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map = L.map('map').setView([48.358, 10.905], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19,
+}).addTo(map);
+
+// ── Sources ──────────────────────────────────────────────────────────────────
+const SOURCES = [
+  { id: 'epoci',    label: 'EPOCI® Augsburg',     color: '#e84040' },
+  { id: 'lausch',   label: 'Lauschtouren',         color: '#2b7de9' },
+  { id: 'wasser_s', label: 'Wasserdrache Stadt',   color: '#17a84f' },
+  { id: 'google',   label: 'Google Pins',          color: '#9b3de8' },
+  { id: 'museen',    label: 'Kostenlose Museen',    color: '#d4860a' },
+  { id: 'unterkunft', label: 'Unterkunft',         color: '#e8407a', iconType: 'star' },
+  { id: 'parkplatz',  label: 'Parkplatz',          color: '#1565c0', iconType: 'parking' },
+];
+const SRC = Object.fromEntries(SOURCES.map(s => [s.id, s]));
+
+// ── Stations ─────────────────────────────────────────────────────────────────
+// Koordinaten sind Näherungswerte.
+// Ein Punkt kann in mehreren Quellen auftauchen (z.B. Augustusbrunnen).
+// Stationen mit mehreren Quellen werden mehrfach eingetragen, je Quelle einmal.
+
+const STATIONS = [
+
+  // ── Quelle 1: EPOCI® (8 Stationen; Stationen 4–8 ab Juli 2026 verfügbar) ──
+  { name: 'Barfüßertor',
+    src: 'epoci', lat: 48.3696848, lng: 10.9011522,
+    desc: 'Ca. 35 m hohes Tor virtuell auf den Straßenbahnschienen an der Barfüßerbrücke.' },
+
+  { name: 'Gögginger Tor',
+    src: 'epoci', lat: 48.3662667, lng: 10.8944004,
+    desc: 'Virtueller Wiederaufbau des Gögginger Tors am heutigen Königsplatz.' },
+
+  { name: 'Fresken am Fuggerstadtpalast',
+    src: 'epoci', lat: 48.3660364, lng: 10.8988073,
+    desc: 'Virtuelle Fresken auf der 68 m langen Hausfront, Maximilianstraße.',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  { name: 'Siegelhaus & Weinstadel',
+    src: 'epoci', lat: 48.365002, lng: 10.899557,
+    desc: 'Prächtiges Gebäude von Elias Holl – bis zum Abriss im 19. Jh. auf der Maximilianstraße.',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  { name: 'Salzstadel (Ulrichsplatz)',
+    src: 'epoci', lat: 48.3627647, lng: 10.9002011,
+    desc: 'Historischer Salzstadel auf dem heutigen Ulrichsplatz.',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  { name: 'Alter Einlass (Staatstheater)',
+    src: 'epoci', lat: 48.369822, lng: 10.892562,
+    desc: 'Nachttor eigens für Kaiser Maximilian I., heute Standort des Staatstheaters.',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  { name: 'Fünfgratturm',
+    src: 'epoci', lat: 48.3737379, lng: 10.9069669,
+    desc: 'Eingebettet in die historische Stadtmauer.',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  { name: 'Unterer St.-Jakobs-Wasserturm',
+    src: 'epoci', lat: 48.3753172, lng: 10.9058896,
+    desc: 'Bei der Kahnfahrt – historische Wasserhebetechnik (UNESCO-Welterbe).',
+    note: 'Ab Juli 2026 verfügbar.' },
+
+  // ── Quelle 2: Lauschtouren (10 offizielle Stationen laut Karte) ─────────────
+  { name: 'Augustusbrunnen',
+    src: 'lausch', lat: 48.3681, lng: 10.8977, order: 1,
+    desc: 'Rathausplatz – Station 1 der Lauschtouren-Welterbe-Tour.',
+    also: ['wasser_s'] },
+
+  { name: 'Vorderer Lech / Kraftwerk',
+    src: 'lausch', lat: 48.368241906559874, lng: 10.90012629439972, order: 2,
+    desc: 'Station 2: Historische Wasserkraftnutzung am Vorderen Lech.' },
+
+  { name: 'Stadtgraben',
+    src: 'lausch', lat: 48.36484431161333, lng: 10.904072270309495, order: 3,
+    desc: 'Station 3: Historischer Stadtgraben der Augsburger Stadtbefestigung.' },
+
+  { name: 'Rotes Tor – Venezianischer Muschelbrunnen',
+    src: 'lausch', lat: 48.35995825530626, lng: 10.902857768972554, order: 4,
+    desc: 'Station 4: Venezianischer Muschelbrunnen am Roten Tor (UNESCO-Welterbe).' },
+
+  { name: 'Beginn Natur- & Trinkwasserschutzgebiet',
+    src: 'lausch', lat: 48.3255, lng: 10.9005, order: 5,
+    desc: 'Station 5: Beginn des Natur- und Trinkwasserschutzgebietes – Übergang in den Hochablass-Bereich.' },
+
+  { name: 'Grundwassermessstelle',
+    src: 'lausch', lat: 48.3230, lng: 10.9090, order: 6,
+    desc: 'Station 6: Messpunkt im Trinkwasserschutzgebiet.' },
+
+  { name: 'Zigeunerbach',
+    src: 'lausch', lat: 48.3225, lng: 10.9155, order: 7,
+    desc: 'Station 7: Gewässer im Hochablass-Naturschutzgebiet.' },
+
+  { name: 'Krötenteich',
+    src: 'lausch', lat: 48.3220, lng: 10.9215, order: 8,
+    desc: 'Station 8: Naturteich im Trinkwasserschutzgebiet.' },
+
+  { name: 'Trommelkonzert',
+    src: 'lausch', lat: 48.3278, lng: 10.9358, order: 9,
+    desc: 'Station 9: Naturkundlicher Höhepunkt nahe dem Reichskanal.' },
+
+  { name: 'Hochablass',
+    src: 'lausch', lat: 48.3375, lng: 10.9482, order: 10,
+    desc: 'Station 10: Historisches Stauwehr am Lech – zentraler Ort des UNESCO-Wassermanagements.' },
+
+  // ── Quelle 3: Wasserdrache Stadt (7 Stationen laut Website) ─────────────────
+  // Augustusbrunnen erscheint auch im Lauschtouren-Layer (oben)
+  { name: 'Vor dem Welterbe-Infozentrum',
+    src: 'wasser_s', lat: 48.368543, lng: 10.897977, order: 1,
+    desc: 'Station 1: Startpunkt am Welterbe-Infozentrum, Rathausplatz.' },
+
+  { name: 'Augustusbrunnen',
+    src: 'wasser_s', lat: 48.368935, lng: 10.897925, order: 2,
+    desc: 'Station 2: Rathausplatz – auch Station 1 der Lauschtouren.',
+    also: ['lausch'] },
+
+  { name: 'Georgsbrunnen',
+    src: 'wasser_s', lat: 48.369552, lng: 10.899557, order: 3,
+    desc: 'Station 3: Historischer Stadtbrunnen.' },
+
+  { name: 'Unteres Brunnenwerk',
+    src: 'wasser_s', lat: 48.372017, lng: 10.900581, order: 4,
+    desc: 'Station 4: Teil des Augsburger UNESCO-Wassermanagement-Systems.' },
+
+  { name: 'Wasserkraftanlage (Mühle)',
+    src: 'wasser_s', lat: 48.369278, lng: 10.900111, order: 5,
+    desc: 'Station 5: Historische Wasserkraftanlage hinter der Mühle.' },
+
+  { name: 'Holbeinplatz',
+    src: 'wasser_s', lat: 48.366899, lng: 10.901383, order: 6,
+    desc: 'Station 6: Platz in der Augsburger Altstadt.' },
+
+  { name: 'Elias-Holl-Platz',
+    src: 'wasser_s', lat: 48.368708, lng: 10.899280, order: 7,
+    desc: 'Station 7: Benannt nach dem Stadtbaumeister Elias Holl.' },
+
+  // ── Quelle 5: Google Pins (4 Stationen) ────────────────────────────────────
+  { name: 'Fuggerei',
+    src: 'google', lat: 48.36872269867929, lng: 10.904038350708092,
+    desc: 'Älteste noch bewohnte Sozialsiedlung der Welt (1521), gegründet von Jakob Fugger.' },
+
+  { name: 'Kräutergarten',
+    src: 'google', lat: 48.3608, lng: 10.9043,
+    desc: 'Historischer Kräutergarten.' },
+
+  { name: 'Augsburger Puppenkiste',
+    src: 'google', lat: 48.3603277, lng: 10.9032989,
+    desc: 'Weltberühmtes Marionettentheater im historischen Heilig-Geist-Spital, Spitalgasse 15.' },
+
+  { name: 'Moritzkirche',
+    src: 'google', lat: 48.3669091119337, lng: 10.897708995182404,
+    desc: 'Evangelische Kirche im Herzen der Altstadt.' },
+
+  { name: 'Augsburger Dom',
+    src: 'google', lat: 48.37264843337391, lng: 10.896833183823546,
+    desc: 'Romanisch-gotischer Dom mit bedeutenden Bronzetüren und mittelalterlichen Glasfenstern.' },
+
+  { name: 'Viadukt am Roten Tor',
+    src: 'google', lat: 48.3591, lng: 10.9033,
+    desc: 'Historisches Aquädukt aus dem 18. Jh. · Rote-Torwall-Straße 14 · Durchgehend geöffnet · 4,6 ★ (16 Bewertungen).' },
+
+  // ── Quelle 6: Kostenlose Museen (4 Museen) ──────────────────────────────────
+  { name: 'Schaezlerpalais',
+    src: 'museen', lat: 48.36510323578052, lng: 10.89928687109286,
+    desc: 'Barockes Stadtpalais mit Deutscher Barockgalerie – kostenloses Museum. Maximilianstraße 46.' },
+
+  { name: 'Maximilianmuseum',
+    src: 'museen', lat: 48.367837948378295, lng: 10.896496441178213,
+    desc: 'Stadtgeschichtliches Museum – kostenloses Museum. Fuggerplatz 1.' },
+
+  { name: 'Römerlager im Zeughaus',
+    src: 'museen', lat: 48.36626593169727, lng: 10.897145873708702,
+    desc: 'Ausstellung zum römischen Legionslager Augusta Vindelicum – kostenloses Museum. Zeugplatz 4.' },
+
+  { name: 'Grafisches Kabinett',
+    src: 'museen', lat: 48.36485335503929, lng: 10.89927664200027,
+    desc: 'Druckgrafik und Zeichnungen – kostenloses Museum. Maximilianstraße 48.' },
+
+  // ── Unterkunft & Parkplatz (gesonderte Markierungen) ─────────────────────
+  { name: 'Unterkunft – Altbaujuwel',
+    src: 'unterkunft', lat: 48.3661, lng: 10.9007,
+    desc: 'Wunderschönes Altbaujuwel in ruhiger Innenstadtlage · Hunoldsgraben 39, 86150 Augsburg.' },
+
+  { name: 'Parkhaus Bleigäßchen',
+    src: 'parkplatz', lat: 48.3656, lng: 10.8962,
+    desc: 'Parkhaus im Bleigäßchen 10 · Open · Closes 1 am · ☎ 0821 71009158.' },
+
+];
+
+// ── Layer groups ─────────────────────────────────────────────────────────────
+const layers = {};
+SOURCES.forEach(s => { layers[s.id] = L.layerGroup().addTo(map); });
+
+function makeIcon(color, iconType, num) {
+  let inner;
+  if (num != null) {
+    const fs = num >= 10 ? 8 : 9;
+    inner = `<circle cx="12" cy="12" r="6.5" fill="white" opacity="0.95"/>
+    <text x="12" y="16" font-family="Arial" font-weight="900" font-size="${fs}" text-anchor="middle" fill="${color}">${num}</text>`;
+  } else if (iconType === 'star') {
+    inner = `<polygon points="12,5 13.5,9.5 18.5,9.5 14.5,12.3 16,17 12,14 8,17 9.5,12.3 5.5,9.5 10.5,9.5" fill="white" opacity="0.95"/>`;
+  } else if (iconType === 'parking') {
+    inner = `<text x="12" y="17" font-family="Arial" font-weight="900" font-size="13" text-anchor="middle" fill="white">P</text>`;
+  } else {
+    inner = `<circle cx="12" cy="12" r="5" fill="white" opacity="0.9"/>`;
+  }
+  const size = iconType ? [28, 40] : [24, 36];
+  const anchor = iconType ? [14, 40] : [12, 36];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="${size[0]}" height="${size[1]}">
+    <path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24S24 21 24 12C24 5.37 18.63 0 12 0z"
+      fill="${color}" stroke="rgba(0,0,0,0.35)" stroke-width="1.5"/>
+    ${inner}
+  </svg>`;
+  return L.divIcon({ html: svg, className: '', iconSize: size, iconAnchor: anchor, popupAnchor: [0, -42] });
+}
+
+STATIONS.forEach(st => {
+  const src = SRC[st.src];
+  const also = (st.also || []).map(id => SRC[id]);
+  const alsoHtml = also.length
+    ? `<div class="popup-source">Auch in: ${also.map(s => `<span style="color:${s.color};font-weight:600">${s.label}</span>`).join(', ')}</div>`
+    : '';
+  const noteHtml = st.note ? `<div class="popup-note">⚠ ${st.note}</div>` : '';
+
+  const popup = `
+    <b>${st.name}</b>
+    <div class="popup-source">${st.desc}</div>
+    ${noteHtml}
+    <div style="margin-top:5px">
+      <span class="popup-badge" style="background:${src.color}">${src.label}</span>
+    </div>
+    ${alsoHtml}
+  `;
+
+  L.marker([st.lat, st.lng], { icon: makeIcon(src.color, src.iconType, st.order) })
+    .bindPopup(popup, { maxWidth: 260 })
+    .addTo(layers[st.src]);
+});
+
+// ── Update header count ──────────────────────────────────────────────────────
+const uniqueCount = STATIONS.length;
+const uniqueLocations = new Set(STATIONS.map(s => `${s.lat},${s.lng}`)).size;
+document.getElementById('count-badge').textContent =
+  `6 Quellen · ${uniqueCount} Einträge (${uniqueLocations} Standorte) · Klick auf Marker für Details`;
+
+// ── Legend ───────────────────────────────────────────────────────────────────
+const legendCtrl = L.control({ position: 'bottomleft' });
+legendCtrl.onAdd = function () {
+  const div = L.DomUtil.create('div', 'legend');
+  div.innerHTML = '<h4>Quellen <small style="color:#aaa;font-weight:normal">(klicken zum Ein-/Ausblenden)</small></h4>';
+
+  SOURCES.forEach(s => {
+    const count = STATIONS.filter(st => st.src === s.id).length;
+    const item = document.createElement('div');
+    item.className = 'legend-item';
+    item.dataset.id = s.id;
+    item.innerHTML = `
+      <div class="legend-dot" style="background:${s.color}"></div>
+      <span>${s.label} <small style="color:#999">(${count})</small></span>
+    `;
+    item.addEventListener('click', () => {
+      const visible = map.hasLayer(layers[s.id]);
+      if (visible) { map.removeLayer(layers[s.id]); item.classList.add('hidden'); }
+      else          { map.addLayer(layers[s.id]);    item.classList.remove('hidden'); }
+    });
+    div.appendChild(item);
+  });
+
+  const note = document.createElement('p');
+  note.style.cssText = 'font-size:0.68rem;color:#aaa;margin-top:8px;line-height:1.4;border-top:1px solid #eee;padding-top:6px';
+  note.innerHTML = '⚠ Koordinaten sind Näherungswerte.<br>★ = Unterkunft · <b>P</b> = Parkplatz<br>Augustusbrunnen erscheint in 2 Layern.';
+  div.appendChild(note);
+
+  L.DomEvent.disableClickPropagation(div);
+  return div;
+};
+legendCtrl.addTo(map);
+</script>
+</body>
+</html>
