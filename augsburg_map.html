@@ -70,13 +70,19 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // ── Sources ──────────────────────────────────────────────────────────────────
 const SOURCES = [
-  { id: 'epoci',    label: 'EPOCI® Augsburg',     color: '#e84040' },
-  { id: 'lausch',   label: 'Lauschtouren',         color: '#2b7de9' },
-  { id: 'wasser_s', label: 'Wasserdrache Stadt',   color: '#17a84f' },
-  { id: 'google',   label: 'Google Pins',          color: '#9b3de8' },
-  { id: 'museen',    label: 'Kostenlose Museen',    color: '#d4860a' },
-  { id: 'unterkunft', label: 'Unterkunft',         color: '#e8407a', iconType: 'star' },
-  { id: 'parkplatz',  label: 'Parkplatz',          color: '#1565c0', iconType: 'parking' },
+  { id: 'epoci',    label: 'EPOCI® Augsburg',   color: '#e84040',
+    urls: [{ label: 'Info', href: 'https://www.augsburg-tourismus.de/de/augsburg-apps/epoci' }] },
+  { id: 'lausch',   label: 'Lauschtouren',       color: '#2b7de9',
+    urls: [{ label: 'Tour', href: 'https://www.bayerisch-schwaben.de/touren/welterbetour-augsburg#/de/bayerisch-schwaben/default/detail/Tour/t_100178380/welterbetour-augsburg' },
+           { label: 'Transkript', href: 'https://www.bayerisch-schwaben.de/fileadmin/bayerisch-schwaben/Dateien_PDF/LT_Transkripte/Transkript_WelterbeTour_Augsburg.pdf' },
+           { label: 'Karte', href: 'https://dam.destination.one/415376/df8c45b8cbedc96b2e5ae3ebc1392a6a58a5fae8f050bfc02bdf95b815314278/lauschtouren_karte_augsburg.jpg' }] },
+  { id: 'wasser_s', label: 'Wasserdrache Stadt', color: '#17a84f',
+    urls: [{ label: 'Tour', href: 'https://www.jt-augsburg.de/audiowalk-wasserdrache-stadt-files' },
+           { label: 'Karte', href: 'https://wassersystem-augsburg.de/sites/default/files/styles/full/public/2022-08/wasserdrache_audiowalk_stadt-karte_final.jpg?itok=m0gp7LgU' }] },
+  { id: 'google',   label: 'Google Pins',        color: '#9b3de8' },
+  { id: 'museen',   label: 'Kostenlose Museen',  color: '#d4860a' },
+  { id: 'unterkunft', label: 'Unterkunft',       color: '#e8407a', iconType: 'star' },
+  { id: 'parkplatz',  label: 'Parkplatz',        color: '#1565c0', iconType: 'parking' },
 ];
 const SRC = Object.fromEntries(SOURCES.map(s => [s.id, s]));
 
@@ -329,6 +335,15 @@ legendCtrl.onAdd = function () {
       else          { map.addLayer(layers[s.id]);    item.classList.remove('hidden'); }
     });
     div.appendChild(item);
+    if (s.urls && s.urls.length) {
+      const links = document.createElement('div');
+      links.style.cssText = 'padding-left:22px; margin-bottom:2px;';
+      links.innerHTML = s.urls.map(u =>
+        `<a href="${u.href}" target="_blank" style="font-size:0.65rem;color:#2b7de9;margin-right:8px;text-decoration:none;">↗ ${u.label}</a>`
+      ).join('');
+      L.DomEvent.disableClickPropagation(links);
+      div.appendChild(links);
+    }
   });
 
   const note = document.createElement('p');
