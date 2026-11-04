@@ -39,6 +39,15 @@
       color: white; font-size: 0.7rem; font-weight: 600; margin-top: 4px; margin-right: 3px;
     }
     .popup-note { font-size: 0.68rem; color: #e07b00; margin-top: 4px; }
+
+    #locate-btn {
+      position: absolute; top: 80px; right: 10px; z-index: 1000;
+      background: white; border: none; border-radius: 8px;
+      width: 40px; height: 40px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      font-size: 1.3rem; display: flex; align-items: center; justify-content: center;
+    }
+    #locate-btn:active { background: #f0f0f0; }
   </style>
 </head>
 <body>
@@ -48,6 +57,7 @@
   <small id="count-badge">6 Quellen · wird geladen…</small>
 </div>
 <div id="map"></div>
+<button id="locate-btn" title="Mein Standort">📍</button>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -330,6 +340,28 @@ legendCtrl.onAdd = function () {
   return div;
 };
 legendCtrl.addTo(map);
+
+// ── Standort-Button ──────────────────────────────────────────────────────────
+let locationMarker = null;
+document.getElementById('locate-btn').addEventListener('click', () => {
+  if (!navigator.geolocation) { alert('Geolocation wird nicht unterstützt.'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const { latitude: lat, longitude: lng } = pos.coords;
+    if (locationMarker) locationMarker.remove();
+    locationMarker = L.circleMarker([lat, lng], {
+      radius: 10, color: '#0057ff', fillColor: '#4d94ff',
+      fillOpacity: 0.85, weight: 3
+    }).addTo(map).bindPopup('📍 Dein Standort');
+    map.setView([lat, lng], 16);
+  }, err => {
+    const msg = {
+      1: 'Standortzugriff verweigert – bitte in den iPhone-Einstellungen unter Datenschutz → Ortungsdienste → Safari erlauben.',
+      2: 'Standort konnte nicht ermittelt werden (kein GPS-Signal).',
+      3: 'Zeitüberschreitung – bitte nochmal versuchen.',
+    };
+    alert(msg[err.code] || `Fehler ${err.code}: ${err.message}`);
+  });
+});
 </script>
 </body>
 </html>
