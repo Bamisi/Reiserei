@@ -64,6 +64,21 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+function apLoad(ap, idx) {
+  const parts = JSON.parse(ap.dataset.parts);
+  idx = Math.max(0, Math.min(parts.length - 1, idx));
+  ap.dataset.idx = idx;
+  const audio = ap.querySelector('.ap-audio');
+  audio.src = parts[idx];
+  audio.load();
+  ap.querySelector('.ap-lbl').textContent = `Teil ${idx + 1} / ${parts.length}`;
+  ap.querySelector('.ap-prev').disabled = idx === 0;
+  ap.querySelector('.ap-next').disabled = idx === parts.length - 1;
+}
+function apPrev(btn) { const ap = btn.closest('.ap'); apLoad(ap, +ap.dataset.idx - 1); }
+function apNext(btn) { const ap = btn.closest('.ap'); apLoad(ap, +ap.dataset.idx + 1); }
+function apEnded(audio) { const ap = audio.closest('.ap'); const parts = JSON.parse(ap.dataset.parts); if (+ap.dataset.idx < parts.length - 1) { apLoad(ap, +ap.dataset.idx + 1); ap.querySelector('.ap-audio').play(); } }
+
 const map = L.map('map').setView([48.358, 10.905], 13);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -274,52 +289,80 @@ const STATIONS = [
     src: 'brecht', lat: 48.3746742226514, lng: 10.906463786205705, order: 8,
     desc: '1900 zog die Familie in die „Haindl-Kolonie" – nach Vorbild der Fuggerei für unbemittelte Augsburger. Brecht schrieb hier „Baal" und „Trommeln in der Nacht".' },
 
-  // ── Fuggerei-Weg (10 Stationen) ─────────────────────────────────────────────
-  { name: 'Fuggerdenkmal, Fuggerplatz',
-    src: 'fuggerei', lat: 48.367667, lng: 10.896972, order: 9,
-    audio: 'https://bamisi.github.io/Reiserei/fuggerei1.mp3',
-    desc: 'Begrüßung – wer war Jakob Fugger? Startpunkt am Fuggerdenkmal auf dem Fuggerplatz.' },
-
+  // ── Fuggerei-Weg (12 Stationen) ────────────────────────────────────────────
   { name: 'Fuggerhäuser, Maximilianstraße 36',
     src: 'fuggerei', lat: 48.3659, lng: 10.8983, order: 1,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.2.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.3.mp3'],
     desc: 'Wirtschaft, Handel, Habsburger, Macht – die Fuggerhäuser als Zentrum des Handelsimperiums.',
     note: 'Koordinate ist Näherungswert.' },
 
+  { name: 'Barfüßerkirche und Barfüßerbrücke',
+    src: 'fuggerei', lat: 48.369414419214074, lng: 10.90020239394273, order: 1.5, pinLabel: '1-2',
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.mp3',
+    desc: 'Zwischenstopp an der Barfüßerkirche und Barfüßerbrücke.' },
+
+  { name: 'Vor dem Haupteingang der Fuggerei',
+    src: 'fuggerei', lat: 48.36983956177562, lng: 10.903642437257536, order: 2,
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei2.mp3',
+    desc: 'Ankunft vor dem Haupteingang der ältesten Sozialsiedlung der Welt.' },
+
   { name: 'Fuggerei, Haupteingang (Jakoberstraße 26)',
-    src: 'fuggerei', lat: 48.369750, lng: 10.903880, order: 2,
+    src: 'fuggerei', lat: 48.369750, lng: 10.903880, order: 3,
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei3.mp3',
     desc: 'Übergang vom Unternehmer zum Stifter – der Haupteingang der ältesten Sozialsiedlung der Welt.' },
 
   { name: 'Fuggerei, Eingangsbereich / Stiftertafel',
-    src: 'fuggerei', lat: 48.368915448524724, lng: 10.903492245578882, order: 3,
+    src: 'fuggerei', lat: 48.368915448524724, lng: 10.903492245578882, order: 4,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei4.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei4.2.mp3'],
     desc: 'Stiftung 1521 – Motive und Geschichte der Fuggerischen Stiftung.',
     note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
 
   { name: 'Gassen der Fuggerei',
-    src: 'fuggerei', lat: 48.3691, lng: 10.9044, order: 4,
+    src: 'fuggerei', lat: 48.3691, lng: 10.9044, order: 5,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei5.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei5.2.mp3'],
     desc: 'Wohnen damals und heute – Spaziergang durch die historischen Gassen der Fuggerei.',
     note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
 
   { name: 'St. Markus, Fuggerei',
-    src: 'fuggerei', lat: 48.36957320357671, lng: 10.903974823329307, order: 5,
+    src: 'fuggerei', lat: 48.36957320357671, lng: 10.903974823329307, order: 6,
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei6.mp3',
     desc: 'Religion und Weiterentwicklung – die Kirche St. Markus im Herzen der Fuggerei.',
     note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
 
   { name: 'Fuggereimuseum, Mittlere Gasse 13/14',
-    src: 'fuggerei', lat: 48.368644, lng: 10.904397, order: 6,
+    src: 'fuggerei', lat: 48.368644, lng: 10.904397, order: 7,
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei7.mp3',
     desc: 'Historische Wohnung und Alltagsleben – das Museum zeigt wie Bewohner über Jahrhunderte lebten.' },
 
   { name: 'Weltkriegsbunker der Fuggerei',
-    src: 'fuggerei', lat: 48.36901464510144, lng: 10.90368858000726, order: 7,
+    src: 'fuggerei', lat: 48.36901464510144, lng: 10.90368858000726, order: 8,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei8.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei8.2.mp3'],
     desc: 'Zerstörung 1944 und Wiederaufbau – der Bunker als stiller Zeuge des Zweiten Weltkriegs.',
     note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
 
   { name: 'Fuggerei, ruhiger Abschlussplatz',
-    src: 'fuggerei', lat: 48.3687, lng: 10.9051, order: 8,
+    src: 'fuggerei', lat: 48.3687, lng: 10.9051, order: 9,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei9.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei9.2.mp3'],
     desc: 'Finanzierung, Gegenwart und Schlussfrage – Abschluss und Reflexion im stillen Innenhof.',
     note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
 
+  { name: 'Fuggerdenkmal, Fuggerplatz',
+    src: 'fuggerei', lat: 48.367667, lng: 10.896972, order: 10,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei10.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei10.2.mp3'],
+    desc: 'Begrüßung – wer war Jakob Fugger? Startpunkt am Fuggerdenkmal auf dem Fuggerplatz.' },
+
   { name: 'St. Anna / Fuggerkapelle (optional)',
     src: 'fuggerei', lat: 48.36782072711065, lng: 10.895256139217823, order: 10,
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.2.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.3.mp3'],
     desc: 'Grablege, Glaube und Reformation – die Fuggerkapelle in der Kirche St. Anna.',
     note: 'Optional. Koordinate ist Näherungswert.' },
 
@@ -478,9 +521,24 @@ STATIONS.forEach(st => {
     ? `<div class="popup-source">Auch in: ${also.map(s => `<span style="color:${s.color};font-weight:600">${s.label}</span>`).join(', ')}</div>`
     : '';
   const noteHtml = st.note ? `<div class="popup-note">⚠ ${st.note}</div>` : '';
-  const audioHtml = st.audio
-    ? `<audio controls style="width:100%;margin-top:8px;height:36px"><source src="${st.audio}" type="audio/mpeg"></audio>`
-    : '';
+  const audioHtml = (() => {
+    if (!st.audio) return '';
+    const parts = Array.isArray(st.audio) ? st.audio : [st.audio];
+    const first = parts[0];
+    if (parts.length === 1) {
+      return `<audio controls style="width:100%;margin-top:8px;height:36px"><source src="${first}" type="audio/mpeg"></audio>`;
+    }
+    const partsJson = JSON.stringify(parts).replace(/"/g, '&quot;');
+    const btnStyle = 'background:none;border:1px solid #ccc;border-radius:4px;cursor:pointer;padding:1px 7px;font-size:0.8rem';
+    return `<div class="ap" data-parts="${partsJson}" data-idx="0" style="margin-top:8px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <button class="ap-prev" onclick="apPrev(this)" style="${btnStyle}" disabled>◀</button>
+        <span class="ap-lbl" style="font-size:0.72rem;color:#555;flex:1;text-align:center">Teil 1 / ${parts.length}</span>
+        <button class="ap-next" onclick="apNext(this)" style="${btnStyle}">▶</button>
+      </div>
+      <audio class="ap-audio" controls onended="apEnded(this)" style="width:100%;height:36px"><source src="${first}" type="audio/mpeg"></audio>
+    </div>`;
+  })();
 
   const popup = `
     <b>${st.name}</b>
@@ -493,7 +551,7 @@ STATIONS.forEach(st => {
     ${alsoHtml}
   `;
 
-  L.marker([st.lat, st.lng], { icon: makeIcon(src.color, src.iconType, st.order) })
+  L.marker([st.lat, st.lng], { icon: makeIcon(src.color, src.iconType, st.pinLabel ?? st.order) })
     .bindPopup(popup, { maxWidth: 260 })
     .addTo(layers[st.src]);
 });
