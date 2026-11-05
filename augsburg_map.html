@@ -86,7 +86,7 @@ const SOURCES = [
            { label: 'Karte', href: 'https://wassersystem-augsburg.de/sites/default/files/styles/full/public/2022-08/wasserdrache_audiowalk_stadt-karte_final.jpg?itok=m0gp7LgU' }],
     iconType: 'dragon' },
   { id: 'google',   label: 'Google Pins',        color: '#9b3de8' },
-  { id: 'brecht',   label: 'Brecht-Weg',         color: '#00897b',
+  { id: 'brecht',   label: 'Brecht-Weg',         color: '#795548',
     urls: [{ label: 'Tour', href: 'https://lifeguide-augsburg.de/de/magazin/walkable-city-app-brecht-durch-augsburg' }],
     iconType: 'book' },
   { id: 'museen',   label: 'Kostenlose Museen',  color: '#d4860a', iconType: 'museum' },
@@ -408,7 +408,29 @@ STATIONS.forEach(st => {
     .addTo(layers[st.src]);
 });
 
-// ── Update header count ──────────────────────────────────────────────────────
+// ── Walking routes via OSRM ──────────────────────────────────────────────────
+SOURCES.forEach(async src => {
+  const ordered = STATIONS
+    .filter(s => s.src === src.id && s.order != null)
+    .sort((a, b) => a.order - b.order);
+  if (ordered.length < 2) return;
+
+  const coords = ordered.map(s => `${s.lng},${s.lat}`).join(';');
+  try {
+    const res = await fetch(
+      `https://routing.openstreetmap.de/routed-foot/route/v1/foot/${coords}?overview=full&geometries=geojson`
+    );
+    const data = await res.json();
+    if (data.routes?.[0]?.geometry?.coordinates) {
+      const latlngs = data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+      L.polyline(latlngs, {
+        color: src.color, weight: 3, opacity: 0.65, dashArray: '7,5'
+      }).addTo(layers[src.id]);
+    }
+  } catch (e) {
+    console.warn('Route fetch failed:', src.id, e);
+  }
+});
 const uniqueCount = STATIONS.length;
 const uniqueLocations = new Set(STATIONS.map(s => `${s.lat},${s.lng}`)).size;
 document.getElementById('count-badge').textContent =
