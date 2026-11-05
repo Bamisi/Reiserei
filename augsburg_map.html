@@ -95,6 +95,8 @@ const SOURCES = [
     urls: [{ label: 'Tour', href: 'https://www.bayerisch-schwaben.de/touren/welterbetour-augsburg#/de/bayerisch-schwaben/default/detail/Tour/t_100178380/welterbetour-augsburg' },
            { label: 'Transkript', href: 'https://www.bayerisch-schwaben.de/fileadmin/bayerisch-schwaben/Dateien_PDF/LT_Transkripte/Transkript_WelterbeTour_Augsburg.pdf' },
            { label: 'Karte', href: 'https://dam.destination.one/415376/df8c45b8cbedc96b2e5ae3ebc1392a6a58a5fae8f050bfc02bdf95b815314278/lauschtouren_karte_augsburg.jpg' }],
+    appLinks: { ios: 'https://apps.apple.com/de/app/bayerisch-schwaben-lauschtour/id516846503',
+                android: 'https://play.google.com/store/apps/details?id=com.locatify.guide.bslauschtour' },
     iconType: 'speaker' },
   { id: 'wasser_s', label: 'Wasserdrache Stadt', color: '#17a84f',
     urls: [{ label: 'Tour', href: 'https://www.jt-augsburg.de/audiowalk-wasserdrache-stadt-files' },
@@ -547,10 +549,17 @@ STATIONS.forEach(st => {
     </div>`;
   })();
 
+  const appHtml = src.appLinks ? `
+    <div style="margin-top:8px;display:flex;gap:6px">
+      <a href="${src.appLinks.ios}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#000;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> App Store</a>
+      <a href="${src.appLinks.android}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#01875f;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> Google Play</a>
+    </div>` : '';
+
   const popup = `
     <b>${st.name}</b>
     <div class="popup-source">${st.desc}</div>
     ${audioHtml}
+    ${appHtml}
     ${noteHtml}
     <div style="margin-top:5px">
       <span class="popup-badge" style="background:${src.color}">${src.label}</span>
