@@ -277,6 +277,7 @@ const STATIONS = [
   // ── Fuggerei-Weg (10 Stationen) ─────────────────────────────────────────────
   { name: 'Fuggerdenkmal, Fuggerplatz',
     src: 'fuggerei', lat: 48.367667, lng: 10.896972, order: 1,
+    audio: 'https://bamisi.github.io/Reiserei/fuggerei1.mp3',
     desc: 'Begrüßung – wer war Jakob Fugger? Startpunkt am Fuggerdenkmal auf dem Fuggerplatz.' },
 
   { name: 'Fuggerhäuser, Maximilianstraße 36',
@@ -477,10 +478,14 @@ STATIONS.forEach(st => {
     ? `<div class="popup-source">Auch in: ${also.map(s => `<span style="color:${s.color};font-weight:600">${s.label}</span>`).join(', ')}</div>`
     : '';
   const noteHtml = st.note ? `<div class="popup-note">⚠ ${st.note}</div>` : '';
+  const audioHtml = st.audio
+    ? `<audio controls style="width:100%;margin-top:8px;height:36px"><source src="${st.audio}" type="audio/mpeg"></audio>`
+    : '';
 
   const popup = `
     <b>${st.name}</b>
     <div class="popup-source">${st.desc}</div>
+    ${audioHtml}
     ${noteHtml}
     <div style="margin-top:5px">
       <span class="popup-badge" style="background:${src.color}">${src.label}</span>
