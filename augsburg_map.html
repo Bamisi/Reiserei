@@ -83,6 +83,8 @@ const SOURCES = [
     urls: [{ label: 'Tour', href: 'https://www.jt-augsburg.de/audiowalk-wasserdrache-stadt-files' },
            { label: 'Karte', href: 'https://wassersystem-augsburg.de/sites/default/files/styles/full/public/2022-08/wasserdrache_audiowalk_stadt-karte_final.jpg?itok=m0gp7LgU' }] },
   { id: 'google',   label: 'Google Pins',        color: '#9b3de8' },
+  { id: 'brecht',   label: 'Brecht-Weg',         color: '#00897b',
+    urls: [{ label: 'Tour', href: 'https://lifeguide-augsburg.de/de/magazin/walkable-city-app-brecht-durch-augsburg' }] },
   { id: 'museen',   label: 'Kostenlose Museen',  color: '#d4860a' },
   { id: 'unterkunft', label: 'Unterkunft',       color: '#e8407a', iconType: 'star' },
   { id: 'parkplatz',  label: 'Parkplatz',        color: '#1565c0', iconType: 'parking' },
@@ -232,6 +234,39 @@ const STATIONS = [
   { name: 'Viadukt am Roten Tor',
     src: 'google', lat: 48.3591, lng: 10.9033,
     desc: 'Historisches Aquädukt aus dem 18. Jh. · Rote-Torwall-Straße 14 · Durchgehend geöffnet · 4,6 ★ (16 Bewertungen).' },
+
+  // ── Brecht-Weg (9 Stationen) ─────────────────────────────────────────────────
+  { name: 'Rathaus / Rathausplatz / Perlachturm',
+    src: 'brecht', lat: 48.36888285272885, lng: 10.89869322922059, order: 1,
+    desc: 'Brecht begrüßt euch mit seinem frühen Gedicht „Serenade", das diesen Ort beschreibt.' },
+
+  { name: 'Gablers Taverne (Lechviertel)',
+    src: 'brecht', lat: 48.36747303531446, lng: 10.900505144372106, order: 2,
+    desc: 'Treffpunkt der „Brecht-Clique". Die Taverne existiert nicht mehr, doch das Lechviertel bleibt ein lebendiges Kneipenviertel.' },
+
+  { name: 'Barfüßerkirche',
+    src: 'brecht', lat: 48.36939983932976, lng: 10.900182078550452, order: 3,
+    desc: 'Hier wurde Brecht getauft und konfirmiert. Im Zweiten Weltkrieg fast völlig zerstört – heute steht noch der Ostchor.' },
+
+  { name: 'Brechthaus (Geburtshaus)',
+    src: 'brecht', lat: 48.37004742956963, lng: 10.90012045380226, order: 4,
+    desc: 'Berliner Straße 138 – Geburtshaus von Bertolt Brecht (10. Februar 1898). Heute Museum mit Ausstellungen und Veranstaltungen.' },
+
+  { name: 'Liliom (Station „Der Theatermacher")',
+    src: 'brecht', lat: 48.3721655816898, lng: 10.900797824185986, order: 5,
+    desc: 'Am heutigen Kino „Liliom" erfahrt ihr mehr über Brechts Hingabe zum Theater.' },
+
+  { name: 'Bei den Sieben Kindeln',
+    src: 'brecht', lat: 48.37196651727865, lng: 10.901078842733751, order: 6,
+    desc: 'Elternhaus Nr. 2 – hier wurde Brechts Bruder Walter geboren. Die Familie wohnte zwei Jahre hier.' },
+
+  { name: 'Bert-Brecht-Straße (Station „Brecht und seine Frauen")',
+    src: 'brecht', lat: 48.375552526708596, lng: 10.903202343829479, order: 7,
+    desc: 'Hier erinnert sich der Dichter an die Frauen in seinem Leben – Paula Banholzer, Marianne Zoff, Helene Weigel.' },
+
+  { name: 'Elternhaus Nr. 3 (Haindl-Kolonie)',
+    src: 'brecht', lat: 48.3746742226514, lng: 10.906463786205705, order: 8,
+    desc: '1900 zog die Familie in die „Haindl-Kolonie" – nach Vorbild der Fuggerei für unbemittelte Augsburger. Brecht schrieb hier „Baal" und „Trommeln in der Nacht".' },
 
   // ── Quelle 6: Kostenlose Museen (4 Museen) ──────────────────────────────────
   { name: 'Schaezlerpalais',
