@@ -105,12 +105,13 @@ const SOURCES = [
   { id: 'google',   label: 'Google Pins',        color: '#9b3de8' },
   { id: 'brecht',   label: 'Brecht-Weg',         color: '#795548',
     urls: [{ label: 'Tour', href: 'https://lifeguide-augsburg.de/de/magazin/walkable-city-app-brecht-durch-augsburg' }],
+    appLinks: { ios: 'https://apps.apple.com/de/app/der-brecht-weg/id6737717855' },
     iconType: 'book' },
   { id: 'fuggerei', label: 'Fuggerei-Weg',        color: '#0097a7', iconType: 'house' },
   { id: 'museen',   label: 'Kostenlose Museen',  color: '#d4860a', iconType: 'museum' },
   { id: 'essen',    label: 'Essen & Trinken',    color: '#f4511e', iconType: 'fork' },
-  { id: 'unterkunft', label: 'Unterkunft',       color: '#e8407a', iconType: 'star' },
-  { id: 'parkplatz',  label: 'Parkplatz',        color: '#1565c0', iconType: 'parking' },
+  { id: 'unterkunft', label: 'Unterkunft',       color: '#e8407a', iconType: 'star',    permanent: true },
+  { id: 'parkplatz',  label: 'Parkplatz',        color: '#1565c0', iconType: 'parking', permanent: true },
 ];
 const SRC = Object.fromEntries(SOURCES.map(s => [s.id, s]));
 
@@ -241,9 +242,6 @@ const STATIONS = [
     desc: 'Station 7: Benannt nach dem Stadtbaumeister Elias Holl.' },
 
   // ── Quelle 5: Google Pins (4 Stationen) ────────────────────────────────────
-  { name: 'Fuggerei',
-    src: 'google', lat: 48.36872269867929, lng: 10.904038350708092,
-    desc: 'Älteste noch bewohnte Sozialsiedlung der Welt (1521), gegründet von Jakob Fugger.' },
 
   { name: 'Kräutergarten',
     src: 'google', lat: 48.3608, lng: 10.9043,
@@ -254,7 +252,13 @@ const STATIONS = [
     desc: 'Weltberühmtes Marionettentheater im historischen Heilig-Geist-Spital, Spitalgasse 15.' },
 
   { name: 'Moritzkirche',
-    src: 'google', lat: 48.3669091119337, lng: 10.897708995182404,
+    src: 'fuggerei', lat: 48.3669091119337, lng: 10.897708995182404, order: 1.3, pinLabel: '1-2',
+    audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.1.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.2.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.3.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.4.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.5.mp3',
+            'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.moritz.6.mp3'],
     desc: 'Evangelische Kirche im Herzen der Altstadt.' },
 
   { name: 'Augsburger Dom',
@@ -304,12 +308,11 @@ const STATIONS = [
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.2.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei1.3.mp3'],
-    desc: 'Wirtschaft, Handel, Habsburger, Macht – die Fuggerhäuser als Zentrum des Handelsimperiums.',
-    note: 'Koordinate ist Näherungswert.' },
+    desc: 'Wirtschaft, Handel, Habsburger, Macht – die Fuggerhäuser als Zentrum des Handelsimperiums.' },
 
   { name: 'Barfüßerkirche und Barfüßerbrücke',
     src: 'fuggerei', lat: 48.369414419214074, lng: 10.90020239394273, order: 1.5, pinLabel: '1-2',
-    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.mp3',
+    audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei.zwischen1-2.barfussmp3.mp3',
     desc: 'Zwischenstopp an der Barfüßerkirche und Barfüßerbrücke.' },
 
   { name: 'Vor dem Haupteingang der Fuggerei',
@@ -327,20 +330,20 @@ const STATIONS = [
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei4.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei4.2.mp3'],
     desc: 'Stiftung 1521 – Motive und Geschichte der Fuggerischen Stiftung.',
-    note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
+    },
 
   { name: 'Gassen der Fuggerei',
     src: 'fuggerei', lat: 48.3691, lng: 10.9044, order: 5,
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei5.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei5.2.mp3'],
     desc: 'Wohnen damals und heute – Spaziergang durch die historischen Gassen der Fuggerei.',
-    note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
+    },
 
   { name: 'St. Markus, Fuggerei',
     src: 'fuggerei', lat: 48.36957320357671, lng: 10.903974823329307, order: 6,
     audio: 'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei6.mp3',
     desc: 'Religion und Weiterentwicklung – die Kirche St. Markus im Herzen der Fuggerei.',
-    note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
+    },
 
   { name: 'Fuggereimuseum, Mittlere Gasse 13/14',
     src: 'fuggerei', lat: 48.368644, lng: 10.904397, order: 7,
@@ -352,14 +355,14 @@ const STATIONS = [
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei8.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei8.2.mp3'],
     desc: 'Zerstörung 1944 und Wiederaufbau – der Bunker als stiller Zeuge des Zweiten Weltkriegs.',
-    note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
+    },
 
   { name: 'Fuggerei, ruhiger Abschlussplatz',
     src: 'fuggerei', lat: 48.3687, lng: 10.9051, order: 9,
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei9.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei9.2.mp3'],
     desc: 'Finanzierung, Gegenwart und Schlussfrage – Abschluss und Reflexion im stillen Innenhof.',
-    note: 'Koordinate im Fuggerei-Areal – Näherungswert.' },
+    },
 
   { name: 'Fuggerdenkmal, Fuggerplatz',
     src: 'fuggerei', lat: 48.367667, lng: 10.896972, order: 10,
@@ -372,8 +375,7 @@ const STATIONS = [
     audio: ['https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.1.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.2.mp3',
             'https://bamisi.github.io/Reiserei/augsburg_audio/fuggerei/fuggerei11.3.mp3'],
-    desc: 'Grablege, Glaube und Reformation – die Fuggerkapelle in der Kirche St. Anna.',
-    note: 'Optional. Koordinate ist Näherungswert.' },
+    desc: 'Grablege, Glaube und Reformation – die Fuggerkapelle in der Kirche St. Anna.' },
 
   // ── Essen & Trinken (3 Spots) ────────────────────────────────────────────────
   { name: 'Augsburger Stadtmarkt',
@@ -549,11 +551,11 @@ STATIONS.forEach(st => {
     </div>`;
   })();
 
-  const appHtml = src.appLinks ? `
-    <div style="margin-top:8px;display:flex;gap:6px">
-      <a href="${src.appLinks.ios}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#000;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> App Store</a>
-      <a href="${src.appLinks.android}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#01875f;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> Google Play</a>
-    </div>` : '';
+  const appHtml = src.appLinks ? (() => {
+    const ios = src.appLinks.ios ? `<a href="${src.appLinks.ios}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#000;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> App Store</a>` : '';
+    const android = src.appLinks.android ? `<a href="${src.appLinks.android}" target="_blank" style="flex:1;text-align:center;padding:5px 4px;background:#01875f;color:#fff;border-radius:6px;font-size:0.68rem;text-decoration:none;line-height:1.3"> Google Play</a>` : '';
+    return `<div style="margin-top:8px;display:flex;gap:6px">${ios}${android}</div>`;
+  })() : '';
 
   const popup = `
     <b>${st.name}</b>
@@ -598,7 +600,7 @@ SOURCES.forEach(async src => {
 const uniqueCount = STATIONS.length;
 const uniqueLocations = new Set(STATIONS.map(s => `${s.lat},${s.lng}`)).size;
 document.getElementById('count-badge').textContent =
-  `6 Quellen · ${uniqueCount} Einträge (${uniqueLocations} Standorte) · v0.9`;
+  `${SOURCES.filter(s => !s.permanent).length} Quellen · ${uniqueCount} Einträge (${uniqueLocations} Standorte) · v0.9`;
 
 // ── Legend ───────────────────────────────────────────────────────────────────
 const legendCtrl = L.control({ position: 'bottomleft' });
@@ -612,6 +614,7 @@ legendCtrl.onAdd = function () {
   div.querySelector('h4').addEventListener('click', () => div.classList.toggle('collapsed'));
 
   SOURCES.forEach(s => {
+    if (s.permanent) return;
     const count = STATIONS.filter(st => st.src === s.id).length;
     const item = document.createElement('div');
     item.className = 'legend-item';
@@ -621,9 +624,35 @@ legendCtrl.onAdd = function () {
       <span>${s.label} <small style="color:#999">(${count})</small></span>
     `;
     item.addEventListener('click', () => {
-      const visible = map.hasLayer(layers[s.id]);
-      if (visible) { map.removeLayer(layers[s.id]); item.classList.add('hidden'); }
-      else          { map.addLayer(layers[s.id]);    item.classList.remove('hidden'); }
+      const toggleable = SOURCES.filter(src => !src.permanent);
+      const allVisible = toggleable.every(src => map.hasLayer(layers[src.id]));
+      if (allVisible) {
+        // Solo: show only this one
+        toggleable.forEach(src => {
+          map.removeLayer(layers[src.id]);
+          document.querySelector(`.legend-item[data-id="${src.id}"]`).classList.add('hidden');
+        });
+        map.addLayer(layers[s.id]);
+        item.classList.remove('hidden');
+      } else {
+        const visible = map.hasLayer(layers[s.id]);
+        if (visible) {
+          // Remove this one; if it was the last, reset to all
+          map.removeLayer(layers[s.id]);
+          item.classList.add('hidden');
+          const anyLeft = toggleable.some(src => map.hasLayer(layers[src.id]));
+          if (!anyLeft) {
+            toggleable.forEach(src => {
+              map.addLayer(layers[src.id]);
+              document.querySelector(`.legend-item[data-id="${src.id}"]`).classList.remove('hidden');
+            });
+          }
+        } else {
+          // Add this one
+          map.addLayer(layers[s.id]);
+          item.classList.remove('hidden');
+        }
+      }
     });
     body.appendChild(item);
     if (s.urls && s.urls.length) {
@@ -636,10 +665,7 @@ legendCtrl.onAdd = function () {
       body.appendChild(links);
     }  });
 
-  const note = document.createElement('p');
-  note.style.cssText = 'font-size:0.68rem;color:#aaa;margin-top:8px;line-height:1.4;border-top:1px solid #eee;padding-top:6px';
-  note.innerHTML = '⚠ Koordinaten sind Näherungswerte.<br>★ = Unterkunft · <b>P</b> = Parkplatz<br>Augustusbrunnen erscheint in 2 Layern.';
-  body.appendChild(note);
+
 
   const guide = document.createElement('div');
   guide.style.cssText = 'margin-top:6px;padding-top:6px;border-top:1px solid #eee;';
