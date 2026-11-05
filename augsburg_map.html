@@ -524,7 +524,7 @@ SOURCES.forEach(async src => {
 const uniqueCount = STATIONS.length;
 const uniqueLocations = new Set(STATIONS.map(s => `${s.lat},${s.lng}`)).size;
 document.getElementById('count-badge').textContent =
-  `6 Quellen · ${uniqueCount} Einträge (${uniqueLocations} Standorte) · Klick auf Marker für Details`;
+  `6 Quellen · ${uniqueCount} Einträge (${uniqueLocations} Standorte) · v0.9`;
 
 // ── Legend ───────────────────────────────────────────────────────────────────
 const legendCtrl = L.control({ position: 'bottomleft' });
